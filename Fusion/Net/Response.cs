@@ -10,9 +10,14 @@ namespace Fusion.Net
     {
         protected byte[] Buffer;
         protected bool Ended = false;
-        internal StateObject NetState;     
+        internal StateObject NetState;
 
         public Request Request { get; protected set; }
+
+        public string ID
+        {
+            get { return NetState.ID; }
+        }
 
         internal Response(StateObject state, Request req)
         {
@@ -34,7 +39,8 @@ namespace Fusion.Net
         public virtual void Stream(string data) { Stream(Encoding.ASCII.GetBytes(data)); }
         public virtual void Stream(byte[] data)
         {
-            NetState.socket.BeginSend(data, 0, data.Length, 0, new AsyncCallback(StreamCallback), NetState);
+            try { NetState.socket.BeginSend(data, 0, data.Length, 0, new AsyncCallback(StreamCallback), NetState); }
+            catch (ObjectDisposedException ode) { }
         }
 
         public virtual void Write(string data) { Write(Encoding.ASCII.GetBytes(data)); }
@@ -49,14 +55,16 @@ namespace Fusion.Net
         private void StreamCallback(IAsyncResult ar)
         {
             StateObject state = (StateObject)ar.AsyncState;
-            int bytes = state.socket.EndSend(ar);
-            //Console.WriteLine(" ** (" + state.ID + ") StreamCallback + Bytes:" + bytes.ToString());
-
-            if (bytes == 0 && Ended)
+            try
             {
-                state.socket.Shutdown(System.Net.Sockets.SocketShutdown.Both);
-                state.socket.Close();                
+                int bytes = state.socket.EndSend(ar);
+                if (bytes == 0 && Ended)
+                {
+                    state.socket.Shutdown(System.Net.Sockets.SocketShutdown.Both);
+                    state.socket.Close();
+                }
             }
+            catch { }
         }
     }
 }

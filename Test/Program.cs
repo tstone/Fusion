@@ -14,7 +14,7 @@ namespace Test
     {
         public void Get(int id)
         {
-            this.Response.Ok(@"
+            /*this.Response.Ok(@"
 
 <html>
     <body>
@@ -27,7 +27,9 @@ namespace Test
     </body>
 </html>
 
-            ");
+            ");*/
+
+            this.Response.Ok("Hello world!");
         }
 
         public void Post(int id)
@@ -42,8 +44,8 @@ namespace Test
         {
             Application app = new Application(new EnvSettings());
             
-            app.AddRoute("/whatever/:id<int>", new HelloWorld());
-            app.AddRoute("/public/*", new StaticHandler());
+            app.AddRoute("/whatever/:id<int>", typeof(HelloWorld));
+            app.AddRoute("/public/*", typeof(StaticHandler));
             
             app.Listen(3000);
         }

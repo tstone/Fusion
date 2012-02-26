@@ -44,6 +44,7 @@
     <Compile Include="EnvSettings.cs" />
     <Compile Include="Handlers\BaseHandler.cs" />
     <Compile Include="Exceptions.cs" />
+    <Compile Include="Handlers\IRouteHandler.cs" />
     <Compile Include="Handlers\StaticHandler.cs" />
     <Compile Include="ISettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

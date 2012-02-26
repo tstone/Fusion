@@ -53,13 +53,19 @@ namespace Fusion.Mvc
 
         internal void Error(WebExceptionEventArgs e)
         {
+            Console.WriteLine();
+            Console.WriteLine("ERR");
+            Console.WriteLine(e);
             Console.WriteLine(e.Exception.Message);
+            Console.WriteLine(e.Exception.InnerException);
+            Console.WriteLine(e.Exception.StackTrace);            
+            Console.WriteLine();
         }
 
         //
         // Syntatic sugar
 
-        public void AddRoute(string route, BaseHandler handler)
+        public void AddRoute(string route, Type handler)
         {
             this.Routes.Add(route, handler);
         }

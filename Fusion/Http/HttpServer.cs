@@ -22,8 +22,11 @@ namespace Fusion.Http
         internal override void Read(IAsyncResult ar)
         {
             StateObject state = (StateObject)ar.AsyncState;
+            int read = 0;
 
-            int read = state.socket.EndReceive(ar);
+            try { read = state.socket.EndReceive(ar); }
+            catch (ObjectDisposedException ode) { return; }
+
             if (read > 0)
             {
                 // Accumulate response...
@@ -67,7 +70,11 @@ namespace Fusion.Http
                 }
             }
 
-            state.socket.BeginReceive(state.buffer, 0, StateObject.BufferSize, SocketFlags.None, new AsyncCallback(Read), state);
+            try
+            {
+                state.socket.BeginReceive(state.buffer, 0, StateObject.BufferSize, SocketFlags.None, new AsyncCallback(Read), state);
+            }
+            catch { }
         }
     }
 }

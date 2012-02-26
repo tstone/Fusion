@@ -99,7 +99,7 @@ namespace Fusion.Http
             _path = firstLine[1];
             _protocol = firstLine[2].Trim();
 
-            Console.WriteLine(DateTime.Now.ToString() + ": " + _path);
+            // Console.WriteLine(DateTime.Now.ToString() + ": " + _path);
 
             if (_path.IndexOf("?") > -1)
             {

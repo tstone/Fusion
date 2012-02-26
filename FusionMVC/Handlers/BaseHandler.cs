@@ -6,12 +6,14 @@ using Fusion.Http;
 
 namespace Fusion.Mvc.Handlers
 {
-    public class BaseHandler
+    public class BaseHandler : IRouteHandler
     {
         public HttpRequest Request { get; set; }
         public HttpResponse Response { get; set; }
         internal RouteInfo RouteInfo { get; set; }
         internal Application App { get; set; }
+
+        #region IRouteHandler Members
 
         public virtual void Begin(HttpRequest req, HttpResponse res, RouteInfo route, Application app)
         {
@@ -19,7 +21,7 @@ namespace Fusion.Mvc.Handlers
             this.Response = res;
             this.RouteInfo = route;
             this.App = app;
-            
+
             // Start the show
             this.PreHandle();
         }
@@ -34,5 +36,7 @@ namespace Fusion.Mvc.Handlers
             // Pass errors upstream to the Application
             this.App.Error(new WebExceptionEventArgs(ex, this));
         }
+
+        #endregion
     }
 }

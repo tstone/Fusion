@@ -47,10 +47,10 @@ namespace Fusion.Mvc
 
     // App-specific Errors
     public class RouteParameterTypeNotValid : Exception { }
+    public class RouteHandlerIsNotIRouteHandler : Exception { }
     public class MissingMethodArguments : Exception {
         public MissingMethodArguments(string message) : base(message) { }
     }
-
 
 }
 

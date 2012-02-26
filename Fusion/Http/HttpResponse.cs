@@ -12,7 +12,7 @@ namespace Fusion.Http
         protected bool HeadersSent = false;
         
         internal HttpResponse(StateObject state, Request req) : base(state, req)
-        {
+        {            
             this.Headers = new NameValueCollection();
             this.Headers.Add("Server", "Fusion");
             this.Headers.Add("Date", DateTime.Now.ToUniversalTime().ToString());
@@ -48,11 +48,20 @@ namespace Fusion.Http
 
         public override void End()
         {
+            // Setup headers
             this.Headers["Content-Length"] = this.Buffer.Length.ToString();
             if (!this.KeepAlive)
                 this.Headers["Connection"] = "close";
 
-            SendHeaders();
+            StringBuilder sb = new StringBuilder();
+            sb.Append("HTTP/1.1 " + this.Status + "\r\n");
+            foreach (string s in this.Headers)
+                sb.Append(s + ": " + this.Headers[s] + "\r\n");
+            sb.Append("\r\n");
+            byte[] headers = Encoding.ASCII.GetBytes(sb.ToString());
+            Buffer = Helpers.ConcatBytes(headers, Buffer);
+
+            // Stream data
             Buffer = Helpers.ConcatBytes(Buffer, Encoding.ASCII.GetBytes("\r\n"));
             this.Stream(Buffer);
             Buffer = new byte[0];
@@ -75,11 +84,11 @@ namespace Fusion.Http
             base.Stream(data);
         } */
 
-        public virtual void StreamHeader(string header, int data) { StreamHeader(header, data.ToString()); }
+        /* public virtual void StreamHeader(string header, int data) { StreamHeader(header, data.ToString()); }
         public virtual void StreamHeader(string header, string data)
         {
             this.Stream(header + ": " + data + "\r\n");
-        }
+        } */
 
         //
         // Helpers
@@ -91,8 +100,8 @@ namespace Fusion.Http
                 StringBuilder sb = new StringBuilder();
                 sb.Append("HTTP/1.1 " + this.Status + "\r\n");
 
-                /* foreach (string s in this.Headers)
-                    sb.Append(s + ": " + this.Headers[s] + "\r\n"); */
+                foreach (string s in this.Headers)
+                    sb.Append(s + ": " + this.Headers[s] + "\r\n");
 
                 sb.Append("\r\n");
                 HeadersSent = true;

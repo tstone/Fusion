@@ -13,7 +13,7 @@ namespace Fusion.Mvc
         private static Regex patternPlaceholders = new Regex(@":([^/<>]+)(?:<([^>]+)>)?");
         
         private Application App;
-        private Dictionary<RouteInfo, BaseHandler> Routes = new Dictionary<RouteInfo, BaseHandler>();
+        private Dictionary<RouteInfo, Type> Routes = new Dictionary<RouteInfo, Type>();
         
         //
         // Construction
@@ -28,19 +28,23 @@ namespace Fusion.Mvc
 
         public void Route(HttpRequest req, HttpResponse res)
         {
-            foreach (KeyValuePair<RouteInfo, BaseHandler> route in this.Routes)
+            foreach (KeyValuePair<RouteInfo, Type> route in this.Routes)
             {
                 Match m = route.Key.Pattern.Match(req.Path);
                 if (m.Success)
                 {
                     route.Key.PatternMatch = m;
-                    route.Value.Begin(req, res, route.Key, this.App);
+                    try {
+                        IRouteHandler handler = (IRouteHandler)Activator.CreateInstance(route.Value);
+                        handler.Begin(req, res, route.Key, this.App);
+                    }
+                    catch { throw new RouteHandlerIsNotIRouteHandler(); }
                     break;
                 }
             }
         }
         
-        public void Add(string route, BaseHandler handler)
+        public void Add(string route, Type handler)
         {
             RouteInfo r = new RouteInfo();
 

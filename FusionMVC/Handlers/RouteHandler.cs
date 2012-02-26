@@ -36,7 +36,14 @@ namespace Fusion.Mvc.Handlers
                 catch (Exception ex)
                 {
                     if (ex is TargetParameterCountException)
-                        this.Error(new MissingMethodArguments("Missing input parameter(s) on " + this.GetType().ToString() + "." + methodName + "()."));
+                    {
+                        // Build list of expected parameters
+                        string p = "";
+                        foreach (KeyValuePair<string, Type> param in this.RouteInfo.Types)
+                            p += param.Key + ", ";
+                        if (p.Length > 0) p = p.Substring(0, p.Length - 2);
+                        this.Error(new MissingMethodArguments("Missing input parameter(s) on " + this.GetType().ToString() + "." + methodName + "(). Expecting: " + p));
+                    }
                     else
                         this.Error(ex);
                 }
